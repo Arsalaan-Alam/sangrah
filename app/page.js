@@ -80,6 +80,12 @@ const Home = () => {
                 Pricing Data
               </button>
             </a>
+           
+              <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mx-2"
+              onClick={() => router.push(`/info/${address}`)} >
+                Your Info
+              </button>
+         
             <button
               className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mx-2"
               onClick={disconnectKeplr}
