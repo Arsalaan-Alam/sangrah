@@ -11,7 +11,8 @@ const Benchmarking = () => {
   const [numRequests, setNumRequests] = useState(1);
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [requestDetails, setRequestDetails] = useState([]); // New state to store request details
+  const [requestDetails, setRequestDetails] = useState([]);
+  const [errors, setErrors] = useState({}); // State to track validation errors
 
   const handleAddJsonInput = () => {
     setJsonInputs([...jsonInputs, '']);
@@ -23,11 +24,49 @@ const Benchmarking = () => {
     setJsonInputs(newJsonInputs);
   };
 
+  const validateJson = (jsonString) => {
+    try {
+      JSON.parse(jsonString);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  };
+
+  const validateInputs = () => {
+    const newErrors = {};
+
+    if (!url) {
+      newErrors.url = "URL is required";
+    }
+
+    jsonInputs.forEach((jsonInput, index) => {
+      if (!validateJson(jsonInput)) {
+        newErrors[`jsonInput${index}`] = `Request JSON ${index + 1} is not valid JSON`;
+      }
+    });
+
+    if (headers && !validateJson(headers)) {
+      newErrors.headers = "Headers are not valid JSON";
+    }
+
+    if (numRequests <= 0) {
+      newErrors.numRequests = "Number of requests must be a positive integer";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSubmit = async () => {
+    if (!validateInputs()) {
+      return;
+    }
+
     setLoading(true);
     const headersObj = JSON.parse(headers || '{}');
     const requests = [];
-    const details = []; // Array to collect request details
+    const details = [];
 
     for (let i = 0; i < numRequests; i++) {
       const randomPayload = JSON.parse(jsonInputs[Math.floor(Math.random() * jsonInputs.length)]);
@@ -70,13 +109,12 @@ const Benchmarking = () => {
     const averageTime = totalTime / numRequests;
 
     setResults({ successCount, failedCount, averageTime });
-    setRequestDetails(details); // Update state with request details
+    setRequestDetails(details);
     setLoading(false);
   };
 
   return (
     <div className="container mx-auto p-4 mt-4">
-    <h1 className="text-3xl font-bold mb-4">Benchmarking Tool for your Akash models</h1>
       <div className="mb-4">
         <label className="block mb-2">Prediction URL</label>
         <input
@@ -85,6 +123,7 @@ const Benchmarking = () => {
           onChange={(e) => setUrl(e.target.value)}
           className="w-full p-2 border border-gray-300 rounded"
         />
+        {errors.url && <p className="text-red-500">{errors.url}</p>}
       </div>
 
       {jsonInputs.map((jsonInput, index) => (
@@ -96,6 +135,7 @@ const Benchmarking = () => {
             className="w-full p-2 border border-gray-300 rounded"
             rows="4"
           />
+          {errors[`jsonInput${index}`] && <p className="text-red-500">{errors[`jsonInput${index}`]}</p>}
         </div>
       ))}
       <button
@@ -113,6 +153,7 @@ const Benchmarking = () => {
           className="w-full p-2 border border-gray-300 rounded"
           rows="2"
         />
+        {errors.headers && <p className="text-red-500">{errors.headers}</p>}
       </div>
 
       <div className="mb-4">
@@ -123,6 +164,7 @@ const Benchmarking = () => {
           onChange={(e) => setNumRequests(parseInt(e.target.value, 10))}
           className="w-full p-2 border border-gray-300 rounded"
         />
+        {errors.numRequests && <p className="text-red-500">{errors.numRequests}</p>}
       </div>
 
       <button
