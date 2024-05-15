@@ -25,7 +25,11 @@ const Dashboard = () => {
   }
 
   if (!data) {
-    return <p>No data available</p>;
+    return <p className='mt-4'>No data available</p>;
+  }
+
+  const formatAmount = (value) => {
+    return (value / 1000000).toFixed(2);
   }
 
   return (
@@ -50,12 +54,12 @@ const Dashboard = () => {
         <div className="bg-white p-4 rounded shadow grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <div>
             <h3 className="font-semibold mb-2">Spending</h3>
-            <p><strong>Total UAKT Spent:</strong> {data.now.totalUAktSpent / 1000000}</p>
-            <p><strong>Total UUSDC Spent:</strong> {data.now.totalUUsdcSpent}</p>
-            <p><strong>Total UUSD Spent:</strong> {data.now.totalUUsdSpent}</p>
-            <p><strong>Daily UAKT Spent:</strong> {data.now.dailyUAktSpent / 1000000}</p>
-            <p><strong>Daily UUSDC Spent:</strong> {data.now.dailyUUsdcSpent}</p>
-            <p><strong>Daily UUSD Spent:</strong> {data.now.dailyUUsdSpent}</p>
+            <p><strong>Total AKT Spent:</strong> {(data.now.totalUAktSpent / 1000000).toFixed(2)}</p>
+            <p><strong>Total USDC Spent:</strong> {(data.now.totalUUsdcSpent / 1000000).toFixed(2)}</p>
+            <p><strong>Total USD Spent:</strong> {(data.now.totalUUsdSpent / 1000000).toFixed(2)}</p>
+            <p><strong>Daily AKT Spent:</strong> {(data.now.dailyUAktSpent / 1000000).toFixed(2)}</p>
+            <p><strong>Daily USDC Spent:</strong> {(data.now.dailyUUsdcSpent / 1000000).toFixed(2)}</p>
+            <p><strong>Daily USD Spent:</strong> {(data.now.dailyUUsdSpent / 100000).toFixed(2)}</p>
           </div>
           <div>
             <h3 className="font-semibold mb-2">Leases</h3>
