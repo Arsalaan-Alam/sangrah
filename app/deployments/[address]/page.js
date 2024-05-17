@@ -1,9 +1,8 @@
 "use client"
 import React, { useEffect, useState, useParams } from 'react';
-import { useRouter } from "next/navigation";
-import Link from "next/link";
-import { Router } from "next/router";
-import DeploymentInfo from './deploymentinfo';
+import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
+
 
 const Page = ({ params }) => {
   const [groups, setGroups] = useState([]);
@@ -17,6 +16,8 @@ const Page = ({ params }) => {
   const [totalGPU, setTotalGPU] = useState(0);
   const [activeCount, setActiveCount] = useState(0);
   const [pausedCount, setPausedCount] = useState(0);
+  const [deployments, setDeployments] = useState([]);
+
 
   useEffect(() => {
     if (!address) {
@@ -42,6 +43,16 @@ const Page = ({ params }) => {
         console.error('There was an error fetching the lease info:', error);
         setLoading(false);
         return [];
+      }
+    };
+
+
+    const fetchDeploymentsData = async () => {
+      const response = await fetch(`https://api.sandbox-01.aksh.pw/akash/deployment/v1beta3/deployments/list?filters.owner=${address}`);
+      const data = await response.json();
+
+      if (data.deployments) {
+          setDeployments(data.deployments);
       }
     };
 
@@ -134,23 +145,40 @@ const Page = ({ params }) => {
     };
 
     fetchAllData();
+    fetchDeploymentsData();
   }, [address]);
 
+  const generateChartData = () => {
+    const labels = deployments.map(deployment => deployment.deployment.deployment_id.dseq);
+    const data = {
+        labels,
+        datasets: [
+            {
+                label: 'Cost (AKT)',
+                data: deployments.map(deployment => parseFloat(deployment.escrow_account.balance.amount) / 1000000),
+                backgroundColor: 'rgba(75, 192, 192, 0.5)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 2
+            }
+        ]
+    };
+    console.log(data);
+    return data;
+};
   if (loading) {
     return <div className="p-6"><p className="text-center">Loading...</p></div>;
   }
 
   return (
     <div className="p-6">
-      <DeploymentInfo
-      totalAmount={totalAmount}
-      totalCPU={totalCPU}
-      totalMemory={totalMemory}
-      totalStorage={totalStorage}
-      totalGPU={totalGPU}
-      activeCount={activeCount}
-      pausedCount={pausedCount}
-    />
+      {/* <div className="mb-6">
+      <Bar data={generateChartData()}
+        options={{
+           responsive: true, plugins: { legend: { position: 'top' }, title: { display: false, text: 'Costs per Deployment' } } }}
+      />
+
+      </div> */}
+
       <p className="text-4xl text-center mt-10 mb-6">Your Deployments</p>
       {groups.length === 0 ? (
         <p className="text-center">No deployments found.</p>
