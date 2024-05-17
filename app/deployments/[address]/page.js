@@ -4,12 +4,18 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Router } from "next/router";
 
-const Page = ({params}) => {
+const Page = ({ params }) => {
   const [groups, setGroups] = useState([]);
   const [leases, setLeases] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [address, setAddress] = useState(params.address)
-
+  const [address, setAddress] = useState(params.address);
+  const [totalAmount, setTotalAmount] = useState(0);
+  const [totalCPU, setTotalCPU] = useState(0);
+  const [totalMemory, setTotalMemory] = useState(0);
+  const [totalStorage, setTotalStorage] = useState(0);
+  const [totalGPU, setTotalGPU] = useState(0);
+  const [activeCount, setActiveCount] = useState(0);
+  const [pausedCount, setPausedCount] = useState(0);
 
   useEffect(() => {
     if (!address) {
@@ -49,18 +55,80 @@ const Page = ({params}) => {
           throw new Error(`Error: ${response.status} ${response.statusText}`);
         }
         const data = await response.json();
-        return data.groups;
+        console.log("hey", data.escrow_account.balance.amount); // Log the deployment data
+        return data;
       } catch (error) {
         console.error('There was an error fetching the deployment info:', error);
-        return [];
+        return null;
       }
     };
 
     const fetchAllData = async () => {
       setLoading(true);
       const dseqs = await fetchLeaseInfo();
-      const groupsData = await Promise.all(dseqs.map(dseq => fetchDeploymentInfo(dseq)));
-      setGroups(groupsData.flat()); // Flattening the array of arrays
+      if (!Array.isArray(dseqs)) {
+        console.error('Invalid dseqs data:', dseqs);
+        setLoading(false);
+        return;
+      }
+
+      const deploymentData = await Promise.all(dseqs.map(dseq => fetchDeploymentInfo(dseq)));
+      const filteredDeploymentData = deploymentData.filter(data => data !== null);
+
+      if (!Array.isArray(filteredDeploymentData)) {
+        console.error('Invalid filteredDeploymentData data:', filteredDeploymentData);
+        setLoading(false);
+        return;
+      }
+
+      const totalAmount = filteredDeploymentData.reduce((sum, data) => sum + parseInt(data.escrow_account.balance.amount), 0);
+      setTotalAmount(totalAmount);
+
+      // Calculate total CPU, Memory, Storage, and GPU
+      let totalCPU = 0, totalMemory = 0, totalStorage = 0, totalGPU = 0;
+      filteredDeploymentData.forEach(data => {
+        if (Array.isArray(data.groups)) {
+          data.groups.forEach(group => {
+            if (Array.isArray(group.group_spec.resources)) {
+              group.group_spec.resources.forEach(resource => {
+                totalCPU += resource.resource.cpu.units.val * 0.001;
+                totalMemory += resource.resource.memory.quantity.val / 1000000;
+                totalStorage += resource.resource.storage[0].quantity.val / 1000000;
+                totalGPU += resource.resource.gpu.units.val;
+              });
+            } else {
+              console.error('Invalid group.group_spec.resources data:', group.group_spec.resources);
+            }
+          });
+        } else {
+          console.error('Invalid data.groups data:', data.groups);
+        }
+      });
+      setTotalCPU(totalCPU.toFixed(2));
+      setTotalMemory(totalMemory.toFixed(2));
+      setTotalStorage(totalStorage.toFixed(2));
+      setTotalGPU(totalGPU);
+
+      // Count active and paused deployments
+      let activeCount = 0, pausedCount = 0;
+      filteredDeploymentData.forEach(data => {
+        if (Array.isArray(data.groups)) {
+          data.groups.forEach(group => {
+            if (group.state === 'open') {
+              activeCount++;
+            } else if (group.state === 'paused'){
+              pausedCount++;
+            }
+
+          });
+        } else {
+          console.error('Invalid data.groups data:', data.groups);
+        }
+      });
+      setActiveCount(activeCount);
+      setPausedCount(pausedCount);
+
+      setGroups(filteredDeploymentData.flatMap(data => data.groups));
       setLoading(false);
     };
 
@@ -73,31 +141,45 @@ const Page = ({params}) => {
 
   return (
     <div className="p-6">
+      <div className="bg-white shadow-lg rounded-lg p-6 mb-6">
+        <p className="text-2xl font-bold mb-4">Deployment Info</p>
+        <p className="text-lg mb-2">Total Amount: {(totalAmount / 1000000).toFixed(2)}</p>
+        <p className="text-lg mb-2">Total CPU: {totalCPU} cores</p>
+        <p className="text-lg mb-2">Total Memory: {totalMemory} MBs</p>
+        <p className="text-lg mb-2">Total Storage: {totalStorage} MBs</p>
+        <p className="text-lg mb-2">Total GPU: {totalGPU}</p>
+        <p className="text-lg mb-2">Active Deployments: {activeCount}</p>
+        <p className="text-lg mb-2">Paused Deployments: {pausedCount}</p>
+      </div>
       <p className="text-4xl text-center mt-10 mb-6">Your Deployments</p>
       {groups.length === 0 ? (
         <p className="text-center">No deployments found.</p>
       ) : (
-        groups.map((group, index) => (
-          <div key={index} className="bg-white shadow-lg rounded-lg p-6 mb-6">
-            <p className="text-lg font-bold mb-2">Owner: {group.group_id.owner}</p>
-            <p className="text-lg font-bold mb-2">State: {group.state}</p>
-            <p className="text-lg font-bold mb-2">Name: {group.group_spec.name}</p>
-            <div className="mb-4">
-              <p className="text-md font-semibold">Resources:</p>
-              {group.group_spec.resources.map((resource, resIndex) => (
-                <div key={resIndex} className="border p-4 rounded-lg mt-2">
-                  <p>CPU: {0.001 * resource.resource.cpu.units.val} cores</p>
-                  <p>Memory: {resource.resource.memory.quantity.val / 1000000} MBs</p>
-                  <p>Storage: {resource.resource.storage[0].quantity.val / 1000000} MBs</p>
-                  <p>GPU: {resource.resource.gpu.units.val}</p>
-                  <p>Endpoints: {resource.resource.endpoints.map(endpoint => endpoint.kind).join(', ')}</p>
-                  <p>Price: {resource.price.amount} {resource.price.denom}</p>
-                </div>
-              ))}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {groups.map((group, index) => (
+            <div key={index} className="bg-white shadow-lg rounded-lg overflow-hidden">
+              <div className="p-6">
+                <p className="text-lg font-bold mb-2">DSEQ: {group.group_id.dseq}</p>
+                <p className="text-lg font-bold mb-2">State: {group.state}</p>
+              </div>
+              <div className="bg-gray-100 p-6">
+                <p className="text-md font-semibold mb-2">Resources:</p>
+                {group.group_spec.resources.map((resource, resIndex) => (
+                  <div key={resIndex} className="border p-4 rounded-lg mb-4 bg-white">
+                    <p>CPU: {0.001 * resource.resource.cpu.units.val} cores</p>
+                    <p>Memory: {(resource.resource.memory.quantity.val / 1000000).toFixed(2)} MBs</p>
+                    <p>Storage: {(resource.resource.storage[0].quantity.val / 1000000).toFixed(2)} MBs</p>
+                    <p>GPU: {resource.resource.gpu.units.val}</p>
+                    <p>Endpoints: {resource.resource.endpoints.map(endpoint => endpoint.kind).join(', ')}</p>
+                  </div>
+                ))}
+              </div>
+              <div className="p-6 bg-gray-200">
+                <p className="text-sm text-gray-600">Created at: {group.created_at}</p>
+              </div>
             </div>
-            <p className="text-sm text-gray-600">Created at: {group.created_at}</p>
-          </div>
-        ))
+          ))}
+        </div>
       )}
     </div>
   );
