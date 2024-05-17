@@ -62,13 +62,7 @@ const Page = ({ params }) => {
             ""
         ]);
     
-        doc.autoTable({ head: [tableColumn], body: tableRows, startY: 20, 
-            didDrawCell: (data) => {
-                if (data.row.index === tableRows.length - 1) {
-                    doc.setFontStyle('bold');
-                }
-            }
-        });
+        doc.autoTable({ head: [tableColumn], body: tableRows, startY: 20});
         doc.text("Deployment Invoice", 14, 15);
         doc.save("invoice.pdf");
     };
