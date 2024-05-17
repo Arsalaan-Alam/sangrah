@@ -10,7 +10,7 @@ const Page = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('https://api.cloudmos.io/v1/providers');
+        const response = await fetch('https://api.cloudmos.io/v1/providers', {mode: 'no-cors'});
         const data = await response.json();
         // Filter providers where hostingProvider is not null and isOnline is true
         const filteredProviders = data.filter(provider => provider.hostingProvider !== null && provider.isOnline === true);

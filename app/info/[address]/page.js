@@ -49,7 +49,7 @@ const Page = ({ params }) => {
         const fetchWalletData = async () => {
             try {
                 if (mainNet) {
-                    const response = await fetch(`https://api.cloudmos.io/v1/addresses/${userAddress}`);
+                    const response = await fetch(`https://api.cloudmos.io/v1/addresses/${userAddress}`, {mode: 'no-cors'});
                     const data = await response.json();
     
                     if (data.assets && data.assets.length > 0) {
@@ -60,7 +60,7 @@ const Page = ({ params }) => {
                     }
                 }
                 else {
-                    const response = await fetch(`https://api-sandbox.cloudmos.io/v1/addresses/${userAddress}`);
+                    const response = await fetch(`https://api-sandbox.cloudmos.io/v1/addresses/${userAddress}`, {mode: 'no-cors'});
                     const data = await response.json();
         
                     if (data.assets && data.assets.length > 0) {

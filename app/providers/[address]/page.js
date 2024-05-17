@@ -13,7 +13,7 @@ const ProviderInfoPage = ({ params }) => {
     if (providerAddress) {
       const fetchData = async () => {
         try {
-          const response = await fetch(`https://api.cloudmos.io/v1/providers/${providerAddress}`);
+          const response = await fetch(`https://api.cloudmos.io/v1/providers/${providerAddress}`, {mode: 'no-cors'});
           if (!response.ok) {
             throw new Error('Failed to fetch provider data');
           }

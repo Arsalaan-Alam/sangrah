@@ -26,6 +26,7 @@ const Page = () => {
     try {
       const response = await fetch(url, {
         method: 'POST',
+        mode: 'no-cors',
         headers: {
           'accept': 'application/json',
           'Content-Type': 'application/json',

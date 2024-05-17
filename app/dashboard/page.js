@@ -8,7 +8,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('https://api.cloudmos.io/v1/dashboard-data');
+        const response = await fetch('https://api.cloudmos.io/v1/dashboard-data', {mode: 'no-cors'});
         const result = await response.json();
         setData(result);
         setLoading(false);
