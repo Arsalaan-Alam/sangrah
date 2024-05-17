@@ -249,10 +249,6 @@ const Page = ({ params }) => {
                     <button className="mt-4 px-4 mb-5 py-2 bg-blue-600 text-white rounded-md" onClick={handleExportInvoice}>
                 Export Invoice
             </button>
-            <h1 className="text-2xl mt-5 font-bold mb-4">Costs per Deployment</h1>
-                    <div className="mt-4">
-                        <Bar data={generateChartData()} options={{ responsive: true, plugins: { legend: { position: 'top' }, title: { display: false, text: 'Costs per Deployment' } } }} />
-                    </div>
                 </div>
             )}
 
