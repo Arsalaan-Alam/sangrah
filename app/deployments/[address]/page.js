@@ -1,8 +1,5 @@
 "use client"
-import React, { useEffect, useState, useParams } from 'react';
-import { useRouter } from "next/navigation";
-import Link from "next/link";
-import { Router } from "next/router";
+import React, { useEffect, useState } from 'react';
 import DeploymentInfo from './deploymentinfo';
 
 const Page = ({ params }) => {
@@ -17,6 +14,8 @@ const Page = ({ params }) => {
   const [totalGPU, setTotalGPU] = useState(0);
   const [activeCount, setActiveCount] = useState(0);
   const [pausedCount, setPausedCount] = useState(0);
+  
+  const [mainNet, setMainNet] = useState(false);
 
   useEffect(() => {
     if (!address) {
@@ -25,7 +24,11 @@ const Page = ({ params }) => {
     }
 
     const fetchLeaseInfo = async () => {
-      const url = new URL('https://api.sandbox-01.aksh.pw/akash/market/v1beta4/leases/list');
+      const baseURL = mainNet 
+        ? 'https://api.akashnet.net/akash/market/v1beta4/leases/list'
+        : 'https://api.sandbox-01.aksh.pw/akash/market/v1beta4/leases/list';
+
+      const url = new URL(baseURL);
       const params = { 'filters.owner': address };
       Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
 
@@ -46,7 +49,11 @@ const Page = ({ params }) => {
     };
 
     const fetchDeploymentInfo = async (dseq) => {
-      const url = new URL('https://api.sandbox-01.aksh.pw:443/akash/deployment/v1beta3/deployments/info');
+      const baseURL = mainNet 
+        ? 'https://api.akashnet.net/akash/deployment/v1beta3/deployments/info'
+        : 'https://api.sandbox-01.aksh.pw:443/akash/deployment/v1beta3/deployments/info';
+
+      const url = new URL(baseURL);
       const params = { 'id.owner': address, 'id.dseq': dseq };
       Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
 
@@ -134,7 +141,7 @@ const Page = ({ params }) => {
     };
 
     fetchAllData();
-  }, [address]);
+  }, [address, mainNet]);
 
   if (loading) {
     return <div className="p-6"><p className="text-center">Loading...</p></div>;
@@ -151,11 +158,22 @@ const Page = ({ params }) => {
       activeCount={activeCount}
       pausedCount={pausedCount}
     />
-      <p className="text-4xl text-center mt-10 mb-6">Your Deployments</p>
+      <p className="text-4xl text-center mt-12 mb-4">Your Active Deployments</p>
+<div className="mb-8 flex items-center justify-center space-x-2">
+  <label htmlFor="mainNet" className="text-sm font-medium text-gray-700">Switch To Mainnet:</label>
+  <input
+    id="mainNet"
+    type="checkbox"
+    className="mt-1"
+    checked={mainNet}
+    onChange={(e) => setMainNet(e.target.checked)}
+  />
+</div>
+
       {groups.length === 0 ? (
         <p className="text-center">No deployments found.</p>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
           {groups.map((group, index) => (
             <div key={index} className="bg-white shadow-lg rounded-lg overflow-hidden">
               <div className="p-6">

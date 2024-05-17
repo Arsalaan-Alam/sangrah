@@ -69,10 +69,10 @@ const Dashboard = () => {
           </div>
           <div>
             <h3 className="font-semibold mb-2">Hardware Utilization</h3>
-            <p><strong>Active CPU:</strong> {data.now.activeCPU}</p>
+            <p><strong>Active CPU:</strong> {(data.now.activeCPU / 1000).toFixed(2)}</p>
             <p><strong>Active GPU:</strong> {data.now.activeGPU}</p>
-            <p><strong>Active Memory:</strong> {data.now.activeMemory}</p>
-            <p><strong>Active Storage:</strong> {data.now.activeStorage}</p>
+            <p><strong>Active Memory:</strong> {(data.now.activeMemory / 1048576).toFixed(2)}</p>
+            <p><strong>Active Storage:</strong> {(data.now.activeStorage / 1048576).toFixed(2)}</p>
           </div>
         </div>
       </section>
@@ -83,32 +83,32 @@ const Dashboard = () => {
         <div className="bg-white p-4 rounded shadow grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <div>
             <h3 className="font-semibold mb-2">Active Resources</h3>
-            <p><strong>Active Provider Count:</strong> {data.networkCapacity.activeProviderCount}</p>
-            <p><strong>Active CPU:</strong> {data.networkCapacity.activeCPU}</p>
+            <p><strong>Active Provider Count:</strong> {data.networkCapacity.activeProviderCount }</p>
+            <p><strong>Active CPU:</strong> {(data.networkCapacity.activeCPU  / 1000).toFixed(2)}</p>
             <p><strong>Active GPU:</strong> {data.networkCapacity.activeGPU}</p>
-            <p><strong>Active Memory:</strong> {data.networkCapacity.activeMemory}</p>
-            <p><strong>Active Storage:</strong> {data.networkCapacity.activeStorage}</p>
+            <p><strong>Active Memory:</strong> {(data.networkCapacity.activeMemory  / 1048576).toFixed(2)}</p>
+            <p><strong>Active Storage:</strong> {(data.networkCapacity.activeStorage / 1048576).toFixed(2)}</p>
           </div>
           <div>
             <h3 className="font-semibold mb-2">Pending Resources</h3>
-            <p><strong>Pending CPU:</strong> {data.networkCapacity.pendingCPU}</p>
+            <p><strong>Pending CPU:</strong> {(data.networkCapacity.pendingCPU  / 1000).toFixed(2)}</p>
             <p><strong>Pending GPU:</strong> {data.networkCapacity.pendingGPU}</p>
-            <p><strong>Pending Memory:</strong> {data.networkCapacity.pendingMemory}</p>
-            <p><strong>Pending Storage:</strong> {data.networkCapacity.pendingStorage}</p>
+            <p><strong>Pending Memory:</strong> {(data.networkCapacity.pendingMemory  / 1048576).toFixed(2)}</p>
+            <p><strong>Pending Storage:</strong> {(data.networkCapacity.pendingStorage  / 1048576).toFixed(2)}</p>
           </div>
           <div>
             <h3 className="font-semibold mb-2">Available Resources</h3>
-            <p><strong>Available CPU:</strong> {data.networkCapacity.availableCPU}</p>
+            <p><strong>Available CPU:</strong> {(data.networkCapacity.availableCPU  / 1000).toFixed(2)}</p>
             <p><strong>Available GPU:</strong> {data.networkCapacity.availableGPU}</p>
-            <p><strong>Available Memory:</strong> {data.networkCapacity.availableMemory}</p>
-            <p><strong>Available Storage:</strong> {data.networkCapacity.availableStorage}</p>
+            <p><strong>Available Memory:</strong> {(data.networkCapacity.availableMemory  / 1048576).toFixed(2)}</p>
+            <p><strong>Available Storage:</strong> {(data.networkCapacity.availableStorage  / 1048576).toFixed(2)}</p>
           </div>
           <div>
             <h3 className="font-semibold mb-2">Total Network Resources</h3>
-            <p><strong>Total CPU:</strong> {data.networkCapacity.totalCPU}</p>
+            <p><strong>Total CPU:</strong> {(data.networkCapacity.totalCPU  / 1000).toFixed(2)}</p>
             <p><strong>Total GPU:</strong> {data.networkCapacity.totalGPU}</p>
-            <p><strong>Total Memory:</strong> {data.networkCapacity.totalMemory}</p>
-            <p><strong>Total Storage:</strong> {data.networkCapacity.totalStorage}</p>
+            <p><strong>Total Memory:</strong> {(data.networkCapacity.totalMemory  / 1048576).toFixed(2)}</p>
+            <p><strong>Total Storage:</strong> {(data.networkCapacity.totalStorage  / 1048576).toFixed(2)}</p>
           </div>
         </div>
       </section>

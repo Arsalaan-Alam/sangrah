@@ -55,13 +55,14 @@ const Header = () => {
       <div className="container mx-auto px-6 py-4 flex items-center justify-between">
        <a href='/'> <div className="text-3xl font-bold text-blue-500 mr-4">Sangrah</div></a>
         <div className="flex items-center justify-center flex-grow">
-          <nav className="flex space-x-6">
+          <nav className="flex space-x-16">
            
-            <a href="/providers" className="text-gray-700 hover:text-blue-500">Providers Data</a>
-            <a href="/pricing" className="text-gray-700 hover:text-blue-500">Pricing Data</a>
-            <a href={`/deployments/${address}`} className="text-gray-700 hover:text-blue-500">Deployments Data</a>
-            <a href={`/info/${address}`} className="text-gray-700 hover:text-blue-500">Your Info</a>
+           
+            {/* <a href="/pricing" className="text-gray-700 hover:text-blue-500">Pricing Data</a> */}
+            <a href={`/deployments/${address}`} className="text-gray-700 hover:text-blue-500">Your Deployments</a>
+            <a href={`/info/${address}`} className="text-gray-700 hover:text-blue-500">Billing Insights</a>
             <a href="/benchmarking" className="text-gray-700 hover:text-blue-500">Run Benchmarks</a>
+            <a href="/providers" className="text-gray-700 hover:text-blue-500">Providers</a>
           </nav>
         </div>
         <div>

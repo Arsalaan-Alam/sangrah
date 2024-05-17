@@ -76,7 +76,8 @@ const DeploymentInfo = ({
   return (
     <div className="bg-white shadow-lg rounded-lg p-6 mb-6">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-bold">Deployment Info</h2>
+        <h2 className="text-2xl font-bold">Overall Deployment Info</h2>
+        
         <p className="text-lg">Price Estimate for the Entire Year: {yearlyEstimate} AKT</p>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

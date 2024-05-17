@@ -166,7 +166,7 @@ const Page = ({ params }) => {
             <h1 className="text-2xl font-bold mb-4">Billing Insights</h1>
             {/* switch for mainnet/sandbox */}
             <div className="mb-4">
-                <label htmlFor="mainNet" className="block text-sm font-medium text-gray-700">MainNet:</label>
+                <label htmlFor="mainNet" className="block text-sm font-medium text-gray-700">Switch To Mainnet:</label>
                 <input
                     id="mainNet"
                     type="checkbox"
