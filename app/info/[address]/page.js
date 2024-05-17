@@ -14,26 +14,72 @@ const Page = ({ params }) => {
     const [timeRange, setTimeRange] = useState('This Month');
     const [isLoading, setIsLoading] = useState(true);
     const [noDeployments, setNoDeployments] = useState(false);
+    const [walletBalance, setWalletBalance] = useState(0);
+
+    const [mainNet, setMainNet] = useState(false);
 
     useEffect(() => {
         const fetchDeploymentData = async () => {
             try {
-                const response = await fetch(`https://api.sandbox-01.aksh.pw/akash/deployment/v1beta3/deployments/list?filters.owner=${userAddress}`);
-                const data = await response.json();
-
-                if (data.deployments) {
-                    setDeployments(data.deployments);
-                    setNoDeployments(data.deployments.length === 0);
+                console.log(">>>>> Fetching Deployment Data for userAddress: ", userAddress, "MainNet: ", mainNet)
+                if (mainNet) {
+                    const response = await fetch(`https://api.akashnet.net/akash/deployment/v1beta3/deployments/list?filters.owner=${userAddress}`);
+                    const data = await response.json();
+                    if (data.deployments) {
+                        setDeployments(data.deployments);
+                        setNoDeployments(data.deployments.length === 0);
+                    }
                 }
+                else {
+                    const response = await fetch(`https://api.sandbox-01.aksh.pw/akash/deployment/v1beta3/deployments/list?filters.owner=${userAddress}`);
+                    const data = await response.json();
+    
+                    if (data.deployments) {
+                        setDeployments(data.deployments);
+                        setNoDeployments(data.deployments.length === 0);
+                    }
+                }
+
             } catch (error) {
                 console.error("Error fetching deployment data:", error);
             } finally {
                 setIsLoading(false);
             }
         };
+        const fetchWalletData = async () => {
+            try {
+                if (mainNet) {
+                    const response = await fetch(`https://api.cloudmos.io/v1/addresses/${userAddress}`);
+                    const data = await response.json();
+    
+                    if (data.assets && data.assets.length > 0) {
+                        const aktAsset = data.assets.find(asset => asset.symbol === "AKT");
+                        if (aktAsset) {
+                            setWalletBalance(aktAsset.amount);
+                        }
+                    }
+                }
+                else {
+                    const response = await fetch(`https://api-sandbox.cloudmos.io/v1/addresses/${userAddress}`);
+                    const data = await response.json();
+        
+                    if (data.assets && data.assets.length > 0) {
+                        const aktAsset = data.assets.find(asset => asset.symbol === "AKT");
+                        if (aktAsset) {
+                            setWalletBalance(aktAsset.amount);
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error("Error fetching wallet data:", error);
+            }
+        };
 
         fetchDeploymentData();
-    }, [userAddress]);
+        fetchWalletData();
+    }, [userAddress, mainNet]);
+
+
 
     const handleExportInvoice = () => {
         const doc = new jsPDF();
@@ -55,7 +101,7 @@ const Page = ({ params }) => {
         // Add final totals
         tableRows.push([
             "Total",
-            deployments.reduce((acc, deployment) => acc + parseFloat(deployment.escrow_account.balance.amount), 0) / 1000000 + " AKT",
+            deployments.reduce(((acc, deployment) => acc + parseFloat(deployment.escrow_account.balance.amount), 0) / 1000000).toFixed(5) + " AKT",
             deployments.reduce((acc, deployment) => acc + parseFloat(deployment.groups[0]?.group_spec.resources[0].resource.cpu.units.val), 0) / 1000,
             deployments.reduce((acc, deployment) => acc + parseFloat(deployment.groups[0]?.group_spec.resources[0].resource.memory.quantity.val), 0) / (1024 * 1024),
             deployments.reduce((acc, deployment) => acc + parseFloat(deployment.groups[0]?.group_spec.resources[0].resource.gpu.units.val), 0),
@@ -78,7 +124,6 @@ const Page = ({ params }) => {
         } else if (timeRange === 'This Year') {
             filteredDeployments = deployments.filter(deployment => moment(deployment.creation_time).isSame(now, 'year'));
         }
-        console.log(filteredDeployments);
 
         return filteredDeployments;
     };
@@ -119,11 +164,33 @@ const Page = ({ params }) => {
     return (
         <div className="container mx-auto mt-4 p-4">
             <h1 className="text-2xl font-bold mb-4">Billing Insights</h1>
+            {/* switch for mainnet/sandbox */}
+            <div className="mb-4">
+                <label htmlFor="mainNet" className="block text-sm font-medium text-gray-700">MainNet:</label>
+                <input
+                    id="mainNet"
+                    type="checkbox"
+                    className="mt-1"
+                    defaultChecked={mainNet}
+                    onChange={(e) => setMainNet(e.target.checked)}
+                />
+            </div>
+
+            <div className="mb-4">
+                <label htmlFor="walletBalance" className="block text-sm font-medium text-gray-700">Wallet Balance (AKT):</label>
+                <input
+                    id="walletBalance"
+                    type="text"
+                    className="w-full p-2 border border-gray-300 rounded mt-1 focus:outline-none focus:ring-indigo-500 sm:text-sm rounded-md"
+                    value={walletBalance}
+                    readOnly
+                />
+            </div>
+
             <div className="mb-4">
                 <label htmlFor="timeRange" className="block text-sm font-medium text-gray-700">Select Time Range:</label>
                 <select
                     id="timeRange"
-                    // className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
                     className="w-full p-2 border border-gray-300 rounded mt-1 focus:outline-none focus:ring-indigo-500 sm:text-sm rounded-md"
                     defaultValue={timeRange}
                     key={timeRange}
@@ -152,14 +219,13 @@ const Page = ({ params }) => {
                             </tr>
                         </thead>
                         <tbody>
-                            {filterDeployments().map((deployment) => 
+                        {
+                            filterDeployments().map((deployment) => 
                             {
-                                console.log(">>>>> Deployment")
-                            console.log(deployment)    
                             return (
                                 <tr key={deployment.deployment_id}>
                                     <td className="px-4 py-2 border">{deployment.deployment.deployment_id.dseq}</td>
-                                    <td className="px-4 py-2 border">{(parseFloat(deployment.escrow_account.balance.amount) / 1000000).toFixed(7)} AKT</td>
+                                    <td className="px-4 py-2 border">{(parseFloat(deployment.escrow_account.balance.amount) / 1000000).toFixed(5)} AKT</td>
                                     <td className="px-4 py-2 border">{deployment.groups[0]?.group_spec.resources[0].resource.cpu.units.val / 1000 || "N/A"}</td>
                                     <td className="px-4 py-2 border">{deployment.groups[0]?.group_spec.resources[0].resource.memory.quantity.val / (1024 * 1024) || "N/A"}</td>
                                     <td className="px-4 py-2 border">{deployment.groups[0]?.group_spec.resources[0].resource.gpu.units.val || "N/A"}</td>
@@ -172,7 +238,7 @@ const Page = ({ params }) => {
                         <tfoot>
                             <tr className='font-medium'>
                                 <td className="px-4 py-2 border">Total</td>
-                                <td className="px-4 py-2 border">{deployments.reduce((acc, deployment) => acc + parseFloat(deployment.escrow_account.balance.amount), 0) / 1000000} AKT</td>
+                                <td className="px-4 py-2 border">{(deployments.reduce((acc, deployment) => acc + parseFloat(deployment.escrow_account.balance.amount), 0) / 1000000).toFixed(5)} AKT</td>
                                 <td className="px-4 py-2 border">{deployments.reduce((acc, deployment) => acc + parseFloat(deployment.groups[0]?.group_spec.resources[0].resource.cpu.units.val), 0) / 1000}</td>
                                 <td className="px-4 py-2 border">{deployments.reduce((acc, deployment) => acc + parseFloat(deployment.groups[0]?.group_spec.resources[0].resource.memory.quantity.val), 0) / (1024 * 1024)}</td>
                                 <td className="px-4 py-2 border">{deployments.reduce((acc, deployment) => acc + parseFloat(deployment.groups[0]?.group_spec.resources[0].resource.gpu.units.val), 0)}</td>
