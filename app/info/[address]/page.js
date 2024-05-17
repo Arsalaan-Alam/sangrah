@@ -101,7 +101,7 @@ const Page = ({ params }) => {
         // Add final totals
         tableRows.push([
             "Total",
-            deployments.reduce(((acc, deployment) => acc + parseFloat(deployment.escrow_account.balance.amount), 0) / 1000000).toFixed(5) + " AKT",
+            deployments.reduce(((acc, deployment) => acc + parseFloat(deployment.escrow_account.balance.amount), 0) / 1000000).toFixed(7) + " AKT",
             deployments.reduce((acc, deployment) => acc + parseFloat(deployment.groups[0]?.group_spec.resources[0].resource.cpu.units.val), 0) / 1000,
             deployments.reduce((acc, deployment) => acc + parseFloat(deployment.groups[0]?.group_spec.resources[0].resource.memory.quantity.val), 0) / (1024 * 1024),
             deployments.reduce((acc, deployment) => acc + parseFloat(deployment.groups[0]?.group_spec.resources[0].resource.gpu.units.val), 0),
@@ -225,7 +225,7 @@ const Page = ({ params }) => {
                             return (
                                 <tr key={deployment.deployment_id}>
                                     <td className="px-4 py-2 border">{deployment.deployment.deployment_id.dseq}</td>
-                                    <td className="px-4 py-2 border">{(parseFloat(deployment.escrow_account.balance.amount) / 1000000).toFixed(5)} AKT</td>
+                                    <td className="px-4 py-2 border">{(parseFloat(deployment.escrow_account.balance.amount) / 1000000).toFixed(7)} AKT</td>
                                     <td className="px-4 py-2 border">{deployment.groups[0]?.group_spec.resources[0].resource.cpu.units.val / 1000 || "N/A"}</td>
                                     <td className="px-4 py-2 border">{deployment.groups[0]?.group_spec.resources[0].resource.memory.quantity.val / (1024 * 1024) || "N/A"}</td>
                                     <td className="px-4 py-2 border">{deployment.groups[0]?.group_spec.resources[0].resource.gpu.units.val || "N/A"}</td>
@@ -238,7 +238,7 @@ const Page = ({ params }) => {
                         <tfoot>
                             <tr className='font-medium'>
                                 <td className="px-4 py-2 border">Total</td>
-                                <td className="px-4 py-2 border">{(deployments.reduce((acc, deployment) => acc + parseFloat(deployment.escrow_account.balance.amount), 0) / 1000000).toFixed(5)} AKT</td>
+                                <td className="px-4 py-2 border">{(deployments.reduce((acc, deployment) => acc + parseFloat(deployment.escrow_account.balance.amount), 0) / 1000000).toFixed(7)} AKT</td>
                                 <td className="px-4 py-2 border">{deployments.reduce((acc, deployment) => acc + parseFloat(deployment.groups[0]?.group_spec.resources[0].resource.cpu.units.val), 0) / 1000}</td>
                                 <td className="px-4 py-2 border">{deployments.reduce((acc, deployment) => acc + parseFloat(deployment.groups[0]?.group_spec.resources[0].resource.memory.quantity.val), 0) / (1024 * 1024)}</td>
                                 <td className="px-4 py-2 border">{deployments.reduce((acc, deployment) => acc + parseFloat(deployment.groups[0]?.group_spec.resources[0].resource.gpu.units.val), 0)}</td>
@@ -249,8 +249,8 @@ const Page = ({ params }) => {
                     <button className="mt-4 px-4 mb-5 py-2 bg-blue-600 text-white rounded-md" onClick={handleExportInvoice}>
                 Export Invoice
             </button>
-                </div>
-            )}
+            </div>
+        )}
 
         </div>
     );
