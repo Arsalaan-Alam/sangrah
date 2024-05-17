@@ -3,6 +3,7 @@ import React, { useEffect, useState, useParams } from 'react';
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Router } from "next/router";
+import DeploymentInfo from './deploymentinfo';
 
 const Page = ({ params }) => {
   const [groups, setGroups] = useState([]);
@@ -141,16 +142,15 @@ const Page = ({ params }) => {
 
   return (
     <div className="p-6">
-      <div className="bg-white shadow-lg rounded-lg p-6 mb-6">
-        <p className="text-2xl font-bold mb-4">Deployment Info</p>
-        <p className="text-lg mb-2">Total Amount: {(totalAmount / 1000000).toFixed(2)}</p>
-        <p className="text-lg mb-2">Total CPU: {totalCPU} cores</p>
-        <p className="text-lg mb-2">Total Memory: {totalMemory} MBs</p>
-        <p className="text-lg mb-2">Total Storage: {totalStorage} MBs</p>
-        <p className="text-lg mb-2">Total GPU: {totalGPU}</p>
-        <p className="text-lg mb-2">Active Deployments: {activeCount}</p>
-        <p className="text-lg mb-2">Paused Deployments: {pausedCount}</p>
-      </div>
+      <DeploymentInfo
+      totalAmount={totalAmount}
+      totalCPU={totalCPU}
+      totalMemory={totalMemory}
+      totalStorage={totalStorage}
+      totalGPU={totalGPU}
+      activeCount={activeCount}
+      pausedCount={pausedCount}
+    />
       <p className="text-4xl text-center mt-10 mb-6">Your Deployments</p>
       {groups.length === 0 ? (
         <p className="text-center">No deployments found.</p>
