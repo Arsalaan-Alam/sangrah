@@ -77,12 +77,12 @@ const DeploymentInfo = ({
     <div className="bg-white shadow-lg rounded-lg p-6 mb-6">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-2xl font-bold">Deployment Info</h2>
-        <p className="text-lg">Price Estimate for the Entire Year: ${yearlyEstimate}</p>
+        <p className="text-lg">Price Estimate for the Entire Year: {yearlyEstimate} AKT</p>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <p className="text-lg mb-2">Price this Month: ${priceThisMonth}</p>
-          <p className="text-lg mb-2">Price per Day: ${pricePerDay}</p>
+          <p className="text-lg mb-2">Cost this month: {priceThisMonth} AKT</p>
+          <p className="text-lg mb-2">Cost today: {pricePerDay} AKT</p>
           <p className="text-lg mb-2">Total CPU: {totalCPU} cores</p>
           <p className="text-lg mb-2">Total Memory: {totalMemory} MBs</p>
           <p className="text-lg mb-2">Total Storage: {totalStorage} MBs</p>
