@@ -101,13 +101,12 @@ const Page = ({ params }) => {
         // Add final totals
         tableRows.push([
             "Total",
-            deployments.reduce(((acc, deployment) => acc + parseFloat(deployment.escrow_account.balance.amount), 0) / 1000000).toFixed(5) + " AKT",
+            (deployments.reduce((acc, deployment) => acc + parseFloat(deployment.escrow_account.balance.amount), 0) / 1000000).toFixed(5) + " AKT",
             deployments.reduce((acc, deployment) => acc + parseFloat(deployment.groups[0]?.group_spec.resources[0].resource.cpu.units.val), 0) / 1000,
             deployments.reduce((acc, deployment) => acc + parseFloat(deployment.groups[0]?.group_spec.resources[0].resource.memory.quantity.val), 0) / (1024 * 1024),
             deployments.reduce((acc, deployment) => acc + parseFloat(deployment.groups[0]?.group_spec.resources[0].resource.gpu.units.val), 0),
             ""
         ]);
-    
         doc.autoTable({ head: [tableColumn], body: tableRows, startY: 20});
         doc.text("Deployment Invoice", 14, 15);
         doc.save("invoice.pdf");
