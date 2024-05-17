@@ -4,7 +4,7 @@ import Header from './Header';
 import Dashboard from './dashboard/page';
 import { Router, Routes, Route, BrowserRouter } from 'react-router-dom';
 
-const HomeComponent = () => {
+const Home = () => {
   return (
 
     <div className="min-h-screen bg-gray-100 flex flex-col items-center">
@@ -20,15 +20,7 @@ const HomeComponent = () => {
   );
 };
 
-const Home = () => {
-  return (
-    <BrowserRouter>
-    <Routes>
-      <Route path="/" element={<HomeComponent />} />
-    </Routes>
-    </BrowserRouter>
-  );
-}
+
 
 
 export default Home;
